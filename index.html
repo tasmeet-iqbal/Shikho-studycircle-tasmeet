@@ -1,0 +1,618 @@
+<!doctype html>
+<html lang="bn">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>StudyCircle v1</title>
+<style>
+@font-face{font-family:'Exo';src:url('fonts/Exo/static/Exo-Regular.ttf');font-weight:400;}
+@font-face{font-family:'Exo';src:url('fonts/Exo/static/Exo-Medium.ttf');font-weight:500;}
+@font-face{font-family:'Exo';src:url('fonts/Exo/static/Exo-SemiBold.ttf');font-weight:600;}
+@font-face{font-family:'Exo';src:url('fonts/Exo/static/Exo-Bold.ttf');font-weight:700;}
+@font-face{font-family:'Exo';src:url('fonts/Exo/static/Exo-ExtraBold.ttf');font-weight:800;}
+@font-face{font-family:'Hind';src:url('fonts/Hind_Siliguri/HindSiliguri-Regular.ttf');font-weight:400;}
+@font-face{font-family:'Hind';src:url('fonts/Hind_Siliguri/HindSiliguri-Medium.ttf');font-weight:500;}
+@font-face{font-family:'Hind';src:url('fonts/Hind_Siliguri/HindSiliguri-SemiBold.ttf');font-weight:600;}
+@font-face{font-family:'Hind';src:url('fonts/Hind_Siliguri/HindSiliguri-Bold.ttf');font-weight:700;}
+:root{--indigo:#2A3580;--indigo7:#222B6B;--indigo50:#EEF0FA;--magenta:#B51E73;--magenta2:#E0337F;--mag50:#FBEAF3;
+  --sunrise:#D49612;--sun50:#FBF1DD;--ink:#1E2030;--ink2:#5B5E72;--ink3:#9A9CB0;--line:#ECECF3;--bg:#F6F6FB;
+  --r:12px;--r-lg:16px;--pill:999px;--fen:'Exo',sans-serif;--fbn:'Hind','Exo',sans-serif;
+  --e1:0 1px 3px rgba(42,53,128,.07);--e2:0 6px 18px rgba(42,53,128,.10);--e3:0 16px 40px rgba(42,53,128,.16);}
+*{box-sizing:border-box;margin:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:var(--fbn);background:#E7E7EF;color:var(--ink);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:12px;padding:16px 24px 24px;}
+.en{font-family:var(--fen);}svg{display:block;}
+.bn{font-family:var(--fbn);}
+.phone{width:392px;height:820px;background:#0b0b0f;border-radius:44px;padding:9px;box-shadow:var(--e3);}
+.stage{position:relative;width:100%;height:100%;background:var(--bg);border-radius:35px;overflow:hidden;display:flex;flex-direction:column;}
+.sb{height:34px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:600 12px var(--fen);color:#fff;flex:0 0 auto;background:var(--indigo);}
+.sb .ic{display:flex;gap:5px;}.sb .ic i{width:15px;height:9px;border-radius:2px;background:#fff;opacity:.9;}.sb .ic i.b{width:20px;}
+.top{flex:0 0 auto;background:linear-gradient(135deg,#2A3580,#222B6B);color:#fff;padding:10px 14px;display:flex;align-items:center;justify-content:space-between;}
+.top .tleft{display:flex;align-items:center;gap:10px;}
+.top .tbird{width:30px;height:30px;border-radius:8px;background:#fff;padding:3px;object-fit:contain;display:block;}
+.top .tai{color:#C9B6FF;display:flex;align-items:center;}
+.top .tclass{display:inline-flex;align-items:center;gap:5px;border:none;background:none;padding:0;font:600 13px var(--fbn);color:#fff;cursor:pointer;}
+.top .tclass svg{color:rgba(255,255,255,.7);}
+.top .tav{width:34px;height:34px;border-radius:50%;background:#fff;color:var(--magenta);display:flex;align-items:center;justify-content:center;font:700 14px var(--fen);}
+.chip{font:600 10.5px var(--fen);background:rgba(255,255,255,.16);border:1px solid rgba(255,255,255,.22);border-radius:var(--pill);padding:5px 10px;display:inline-flex;align-items:center;gap:4px;}
+.av{width:33px;height:33px;border-radius:50%;background:#fff;color:var(--magenta);display:flex;align-items:center;justify-content:center;font:700 13px var(--fen);}
+.screens{flex:1;position:relative;overflow:hidden;}
+.screen{position:absolute;inset:0;overflow-y:auto;display:none;}
+.screen::-webkit-scrollbar{display:none;}
+.screen.on{display:block;}
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;height:100%;gap:10px;color:var(--ink3);padding:30px;text-align:center;}
+.empty svg{color:var(--ink3);}
+.empty .t{font:600 14px var(--fbn);color:var(--ink2);}
+.nav{flex:0 0 auto;display:flex;border-top:1px solid var(--line);background:#fff;padding:7px 6px 9px;}
+.nav .t{flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--ink3);font:600 10px var(--fbn);cursor:pointer;position:relative;padding-top:3px;background:none;border:none;}
+.nav .t.on{color:var(--magenta);}
+.nav .t.on::before{content:"";position:absolute;top:-7px;width:24px;height:3px;border-radius:99px;background:var(--magenta);}
+.lesson-overlay{position:absolute;left:0;right:0;top:34px;bottom:0;background:var(--bg);z-index:30;display:none;flex-direction:column;overflow-y:auto;}
+.lesson-overlay::-webkit-scrollbar{display:none;}
+.lesson-overlay.on{display:flex;}
+
+/* ===== Agent A: Class Circle ===== */
+.scWrap{padding:16px 14px 8px;}
+.scHead{margin:2px 2px 14px;}
+.scTitle{font:700 20px var(--fbn);color:var(--ink);line-height:1.2;}
+.scSub{font:500 12.5px var(--fbn);color:var(--ink2);margin-top:4px;}
+.scPresence{display:flex;align-items:center;gap:11px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px 13px;box-shadow:var(--e1);}
+.scPresence .scPi{width:38px;height:38px;border-radius:10px;background:var(--indigo50);color:var(--indigo);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.scPx{flex:1;}
+.scPt{font:600 14px var(--fbn);color:var(--ink);}
+.scPt b{font-weight:800;color:var(--indigo);}
+.scPs{font:400 11.5px var(--fbn);color:var(--ink3);margin-top:2px;}
+.scPanel{margin-top:11px;border-radius:var(--r-lg);background:linear-gradient(160deg,#fff,#F4ECFB);border:1px solid #ECE3F4;padding:15px 15px 14px;box-shadow:var(--e1);}
+.scRow{display:flex;align-items:center;gap:14px;}
+.scRing{width:74px;height:74px;flex:0 0 auto;position:relative;}
+.scRing svg{transform:rotate(-90deg);}
+.scRing .scTk{fill:none;stroke:#E9E1F2;stroke-width:7;}
+.scRing .scBr{fill:none;stroke:url(#g1);stroke-width:7;stroke-linecap:round;stroke-dasharray:201;stroke-dashoffset:201;transition:stroke-dashoffset 1.1s cubic-bezier(0,0,0,1);}
+.scRing .scRingLabel{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:var(--magenta);}
+.scPanelX{flex:1;}
+.scPanelT{font:700 14.5px var(--fbn);color:var(--ink);line-height:1.35;}
+.scPanelT b{color:var(--sunrise);font-weight:800;}
+.scPanelS{font:400 11.5px var(--fbn);color:var(--ink2);margin-top:3px;line-height:1.4;}
+.scBarWrap{margin-top:13px;}
+.scBar{height:8px;background:#EBE2F4;border-radius:99px;overflow:hidden;}
+.scBar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--sunrise),var(--magenta));border-radius:99px;transition:width 1.1s cubic-bezier(0,0,0,1);}
+.scBarCap{font:500 10.5px var(--fbn);color:var(--ink3);margin-top:6px;}
+.scGentle{display:flex;align-items:center;gap:8px;margin:12px 2px 0;font:500 11.5px var(--fbn);color:var(--ink2);line-height:1.4;}
+.scGentle svg{color:var(--magenta);flex-shrink:0;}
+.scCta{margin-top:16px;width:100%;height:52px;border:none;border-radius:var(--pill);background:linear-gradient(100deg,#2A3580,#3a47a6);color:#fff;font:700 15.5px var(--fbn);display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;box-shadow:0 6px 16px rgba(42,53,128,.27);transition:transform .12s;}
+.scCta:active{transform:scale(.975);}
+
+/* ===== Agent C: Lesson ===== */
+.sc-lh{flex:0 0 auto;background:linear-gradient(135deg,#2A3580,#222B6B);color:#fff;padding:8px 14px 14px;}
+.sc-lh .sc-row{display:flex;align-items:center;gap:10px;}
+.sc-bk{width:32px;height:32px;border-radius:9px;background:rgba(255,255,255,.15);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;}
+.sc-lt{font:700 14.5px var(--fbn);}
+.sc-ls{font:400 11px var(--fbn);opacity:.82;margin-top:1px;}
+.sc-body{padding:0 0 16px;}
+.sc-free{margin:14px 14px 0;display:flex;align-items:center;gap:11px;background:linear-gradient(100deg,#E7F6EE,#F2FBF6);border:1px solid #CDEBD9;border-radius:var(--r);padding:12px 13px;}
+.sc-free .sc-fi{width:36px;height:36px;border-radius:10px;background:#fff;color:#2E9E6B;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 1px 3px rgba(46,158,107,.18);}
+.sc-free .sc-fx .a{font:700 13px var(--fbn);color:#1d7a4f;}
+.sc-free .sc-fx .b{font:500 11px var(--fbn);color:#3d8f68;margin-top:2px;line-height:1.35;}
+.sc-player{margin:14px;height:194px;border-radius:16px;background:linear-gradient(135deg,#1a2150,#0e1740);position:relative;display:flex;align-items:center;justify-content:center;box-shadow:var(--e2);overflow:hidden;}
+.sc-player .sc-pmotif{position:absolute;inset:0;opacity:.13;pointer-events:none;}
+.sc-player .sc-pmotif svg{width:100%;height:100%;}
+.sc-player .sc-pglow{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:128px;height:128px;border-radius:50%;background:radial-gradient(circle,rgba(224,51,127,.42),transparent 70%);pointer-events:none;}
+.sc-player .sc-ptopic{position:absolute;left:12px;top:11px;right:12px;display:flex;align-items:center;gap:7px;z-index:1;}
+.sc-player .sc-ptopic .sc-tg{font:700 9.5px var(--fen);letter-spacing:.04em;background:var(--magenta2);color:#fff;border-radius:var(--pill);padding:3px 8px;}
+.sc-player .sc-ptopic .sc-lb{font:600 11.5px var(--fbn);color:#fff;opacity:.96;}
+.sc-player .sc-pbtn{width:62px;height:62px;border-radius:50%;background:rgba(255,255,255,.92);display:flex;align-items:center;justify-content:center;color:var(--indigo);cursor:pointer;position:relative;z-index:1;box-shadow:0 8px 20px rgba(0,0,0,.32);}
+.sc-player .sc-pdur{position:absolute;right:10px;bottom:10px;background:rgba(0,0,0,.55);color:#fff;font:600 9.5px var(--fen);border-radius:6px;padding:3px 7px;z-index:1;}
+.sc-player .sc-pbar{position:absolute;left:0;right:0;bottom:0;height:4px;background:rgba(255,255,255,.18);}
+.sc-player .sc-pbar i{display:block;height:100%;width:0;background:var(--magenta2);transition:width .3s linear;}
+.sc-value{margin:12px 14px 0;display:flex;gap:11px;align-items:flex-start;background:var(--sun50);border:1px solid #F1E2C2;border-radius:var(--r);padding:12px 13px;}
+.sc-value .vi{width:34px;height:34px;border-radius:10px;background:#fff;color:var(--sunrise);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sc-value .a{font:600 11.5px var(--fbn);color:#8a5e09;}
+.sc-value .b{font:600 13px var(--fbn);color:var(--ink);margin-top:2px;line-height:1.35;}
+.sc-presence{margin:10px 14px 4px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:11px 13px;box-shadow:var(--e1);display:flex;align-items:center;gap:10px;}
+.sc-presence .pi{width:34px;height:34px;border-radius:10px;background:#E7F6EE;color:#2E9E6B;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.sc-presence .pt{font:600 12.5px var(--fbn);}
+.sc-presence .ps{font:400 10.5px var(--fbn);color:var(--ink3);margin-top:1px;}
+.sc-h{font:700 14px var(--fbn);margin:16px 14px 8px;display:flex;align-items:baseline;}
+.sc-h .cnt{font:500 11px var(--fbn);color:var(--ink3);margin-left:auto;}
+.sc-step{display:flex;gap:11px;align-items:flex-start;margin:0 14px 9px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px;box-shadow:var(--e1);}
+.sc-step .n{width:26px;height:26px;border-radius:50%;background:var(--indigo50);color:var(--indigo);display:flex;align-items:center;justify-content:center;font:800 12px var(--fen);flex-shrink:0;}
+.sc-step .sx .a{font:600 13px var(--fbn);}
+.sc-step .sx .b{font:400 11px var(--fbn);color:var(--ink3);margin-top:2px;}
+.sc-finish{margin:14px;width:calc(100% - 28px);height:46px;border:none;border-radius:var(--pill);background:linear-gradient(100deg,#2A3580,#3a47a6);color:#fff;font:700 14px var(--fbn);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:0 5px 12px rgba(42,53,128,.25);transition:transform .12s;}
+.sc-finish:active{transform:scale(.985);}
+/* lesson loading + broken-load recovery (defined states) */
+.sc-load,.sc-recover{position:absolute;left:0;right:0;top:34px;bottom:0;background:var(--bg);z-index:40;display:none;flex-direction:column;align-items:center;justify-content:center;padding:34px 28px;text-align:center;}
+.sc-load.on,.sc-recover.on{display:flex;}
+.sc-spin{width:46px;height:46px;border-radius:50%;border:4px solid var(--indigo50);border-top-color:var(--magenta);animation:scspin .8s linear infinite;}
+@keyframes scspin{to{transform:rotate(360deg);}}
+.sc-load .lt{font:600 14px var(--fbn);color:var(--ink2);margin-top:16px;}
+.sc-load .lsk{width:200px;margin-top:18px;}
+.sc-load .lsk i{display:block;height:9px;border-radius:6px;background:var(--line);margin:8px 0;}
+.sc-load .lsk i:nth-child(2){width:70%;margin-left:auto;margin-right:auto;}
+.sc-recover .rback{position:absolute;left:14px;top:12px;width:32px;height:32px;border-radius:9px;background:#fff;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--ink2);}
+.sc-recover .ri{width:60px;height:60px;border-radius:18px;background:#fff;border:1px solid var(--line);box-shadow:var(--e1);color:var(--sunrise);display:flex;align-items:center;justify-content:center;margin-bottom:16px;}
+.sc-recover .rt{font:700 16px var(--fbn);color:var(--ink);}
+.sc-recover .rs{font:500 12.5px var(--fbn);color:var(--ink2);margin-top:7px;line-height:1.5;max-width:262px;}
+.sc-recover .rbtn{margin-top:20px;height:46px;padding:0 22px;border:none;border-radius:var(--pill);background:linear-gradient(100deg,#2A3580,#3a47a6);color:#fff;font:700 14px var(--fbn);display:inline-flex;align-items:center;gap:8px;cursor:pointer;box-shadow:0 5px 12px rgba(42,53,128,.25);}
+.sc-recover .rsupport{margin-top:15px;background:none;border:none;color:var(--ink3);font:600 12px var(--fbn);text-decoration:underline;cursor:pointer;}
+.sc-troublelink{display:block;margin:2px auto 4px;background:none;border:none;color:var(--ink3);font:600 11px var(--fbn);text-decoration:underline;cursor:pointer;}
+.scyou-emptybox{text-align:center;padding:16px 8px 4px;}
+.scyou-emptybox .eb-ic{width:44px;height:44px;border-radius:12px;background:#fff;border:1px solid var(--line);box-shadow:var(--e1);color:var(--ink3);display:flex;align-items:center;justify-content:center;margin:8px auto 12px;}
+.scyou-emptybox .eb-t{font:700 14px var(--fbn);color:var(--ink);}
+.scyou-emptybox .eb-s{font:500 11.5px var(--fbn);color:var(--ink3);margin:5px auto 0;line-height:1.5;max-width:240px;}
+
+/* ===== Agent D: Summary ===== */
+.scyou{margin:14px;padding:16px 15px 15px;background:linear-gradient(160deg,#fff,#F4ECFB);border:1px solid #ECE3F4;border-radius:var(--r-lg);box-shadow:var(--e1);}
+.scyou .en{font-family:var(--fen);}
+.scyou-h{display:flex;align-items:center;gap:11px;}
+.scyou-hi{width:38px;height:38px;border-radius:11px;background:#fff;color:var(--magenta);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:var(--e1);}
+.scyou-ht .t{font:700 16px var(--fbn);color:var(--ink);}
+.scyou-ht .s{font:500 11px var(--fbn);color:var(--ink2);margin-top:2px;}
+.scyou-tiles{display:flex;gap:11px;margin-top:14px;}
+.scyou-tile{flex:1;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:13px 12px;box-shadow:var(--e1);}
+.scyou-ti{width:34px;height:34px;border-radius:10px;background:var(--indigo50);color:var(--indigo);display:flex;align-items:center;justify-content:center;}
+.scyou-ti2{background:var(--mag50);color:var(--magenta);}
+.scyou-tn{font:600 14.5px var(--fbn);color:var(--ink);margin-top:11px;line-height:1.25;}
+.scyou-tn b{font:800 17px var(--fen);color:var(--indigo);}
+.scyou-tile:nth-child(2) .scyou-tn b{color:var(--magenta);}
+.scyou-ts{font:500 11px var(--fbn);color:var(--ink3);margin-top:2px;line-height:1.3;}
+.scyou-note{display:flex;align-items:center;gap:11px;margin-top:13px;background:var(--sun50);border:1px solid #F1E2C2;border-radius:var(--r);padding:11px 13px;}
+.scyou-ni{width:34px;height:34px;border-radius:10px;background:#fff;color:var(--sunrise);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.scyou-nt{font:600 12.5px var(--fbn);color:#8a5e09;line-height:1.35;}
+.scyou-cta{margin-top:14px;width:100%;height:44px;border:none;border-radius:var(--pill);background:linear-gradient(100deg,#2A3580,#3a47a6);color:#fff;font:700 14px var(--fbn);display:flex;align-items:center;justify-content:center;gap:8px;cursor:pointer;box-shadow:0 5px 12px rgba(42,53,128,.25);transition:transform .12s;}
+.scyou-cta:active{transform:scale(.975);}
+
+/* ===== first-class hero (activation) ===== */
+.firstclass{margin:14px 14px 4px;background:#fff;border:1px solid var(--line);border-radius:var(--r-lg);padding:16px 15px 15px;box-shadow:var(--e2);position:relative;overflow:hidden;}
+.firstclass::before{content:"";position:absolute;left:0;top:0;right:0;height:4px;background:linear-gradient(90deg,var(--indigo),var(--magenta2));}
+.fc-eyebrow{display:inline-flex;align-items:center;gap:5px;font:700 10px var(--fbn);color:var(--magenta);background:var(--mag50);border-radius:var(--pill);padding:3px 9px;margin-bottom:12px;}
+.fc-main{display:flex;align-items:center;gap:12px;}
+.fc-ic{width:46px;height:46px;border-radius:13px;flex:0 0 auto;background:linear-gradient(135deg,#2A3580,#3a47a6);color:#fff;display:flex;align-items:center;justify-content:center;padding-left:3px;}
+.fc-tx{flex:1;}
+.fc-t{font:800 17px var(--fbn);color:var(--ink);line-height:1.25;}
+.fc-course{font:600 12.5px var(--fbn);color:var(--ink2);margin-top:3px;line-height:1.3;}
+.fc-meta{display:flex;align-items:center;gap:14px;margin:14px 0 0;flex-wrap:wrap;}
+.fc-meta span{display:inline-flex;align-items:center;gap:5px;font:600 11.5px var(--fbn);color:var(--ink2);}
+.fc-meta .fc-soc{color:var(--magenta);}
+.fc-cta{margin-top:14px;width:100%;height:48px;border:none;border-radius:var(--pill);background:linear-gradient(100deg,#2A3580,#3a47a6);color:#fff;font:700 15px var(--fbn);display:flex;align-items:center;justify-content:center;gap:9px;cursor:pointer;box-shadow:0 6px 14px rgba(42,53,128,.26);transition:transform .12s;}
+.fc-cta:active{transform:scale(.978);}
+
+/* ===== real Shikho home components ===== */
+.sec-h{display:flex;align-items:center;justify-content:space-between;margin:18px 14px 9px;}
+.sec-h h3{font:700 15.5px var(--fbn);}.sec-h a{font:600 12px var(--fbn);color:var(--magenta);display:inline-flex;align-items:center;gap:3px;cursor:pointer;}
+.car{display:flex;gap:11px;overflow-x:auto;padding:2px 14px 8px;scroll-snap-type:x mandatory;-webkit-mask-image:linear-gradient(to right,transparent 0,#000 14px,#000 calc(100% - 34px),transparent 100%);mask-image:linear-gradient(to right,transparent 0,#000 14px,#000 calc(100% - 34px),transparent 100%);}.car::-webkit-scrollbar{display:none;}
+.car>*{scroll-snap-align:start;flex:0 0 auto;}
+.trial{margin:12px 14px 4px;border-radius:var(--r-lg);background:linear-gradient(100deg,#B51E73,#E0337F);color:#fff;padding:14px 15px;display:flex;align-items:center;gap:12px;box-shadow:0 8px 18px rgba(181,30,115,.28);}
+.trial .ti{width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.trial .tx{flex:1;}.trial .tx .t{font:700 14.5px var(--fbn);}.trial .tx .s{font:400 11.5px var(--fbn);opacity:.9;margin-top:1px;}
+.trial .cta{background:#fff;color:var(--magenta);border:none;border-radius:var(--pill);font:700 12px var(--fbn);padding:9px 13px;cursor:pointer;white-space:nowrap;}
+.rcard{width:166px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px;box-shadow:var(--e1);}
+.rcard .ty{display:inline-flex;align-items:center;gap:4px;font:600 10px var(--fbn);color:var(--indigo);background:var(--indigo50);border-radius:var(--pill);padding:3px 8px;}
+.rcard .nm{font:600 13.5px var(--fbn);margin:9px 0 3px;line-height:1.3;}
+.rcard .tm{display:flex;align-items:center;gap:5px;font:500 11px var(--fbn);color:var(--ink3);}
+.rcard .soc{display:flex;align-items:center;gap:5px;font:600 11px var(--fbn);color:var(--magenta);margin-top:9px;padding-top:9px;border-top:1px dashed var(--line);}
+.story{width:96px;}
+.story .th{width:96px;height:128px;border-radius:14px;background:linear-gradient(160deg,#3a2f73,#7a2a63);position:relative;overflow:hidden;}
+.story .th .pl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;z-index:1;}
+.story .cap{font:500 10.5px var(--fbn);color:var(--ink2);margin-top:6px;line-height:1.3;}
+.qcard{width:150px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:13px;box-shadow:var(--e1);}
+.qcard .q{font:800 13px var(--fen);color:var(--indigo);}
+.qcard .qs{font:500 11px var(--fbn);color:var(--ink3);margin-top:2px;}
+.qcard .pgb{height:6px;background:var(--indigo50);border-radius:99px;margin-top:11px;overflow:hidden;}.qcard .pgb i{display:block;height:100%;background:var(--indigo);border-radius:99px;}
+.vcard{width:180px;}
+.vcard .th{width:180px;height:104px;border-radius:12px;background:linear-gradient(135deg,#2A3580,#0e1740);position:relative;}
+.vcard .th .pl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);color:#fff;}
+.vcard .th .dur{position:absolute;right:7px;bottom:7px;background:rgba(0,0,0,.6);color:#fff;font:600 9px var(--fen);border-radius:5px;padding:2px 5px;}
+.vcard .vt{font:600 12.5px var(--fbn);margin-top:7px;line-height:1.3;}
+.vcard .soc{display:flex;align-items:center;gap:5px;font:600 10.5px var(--fbn);color:var(--magenta);margin-top:5px;}
+.lrow{display:flex;align-items:center;gap:12px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:12px 13px;margin:0 14px 9px;box-shadow:var(--e1);cursor:pointer;}
+.lrow .li{width:38px;height:38px;border-radius:10px;background:var(--indigo50);color:var(--indigo);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.lrow .lt{flex:1;}.lrow .lt .a{font:600 13.5px var(--fbn);}.lrow .lt .b{font:400 11.5px var(--fbn);color:var(--ink3);margin-top:1px;}
+.lrow .chev{color:var(--ink3);}
+.banner{margin:4px 14px 0;border-radius:var(--r-lg);background:linear-gradient(120deg,#2A3580,#3a2f73);color:#fff;padding:15px;display:flex;align-items:center;gap:12px;}
+.banner .bx{flex:1;}.banner .bx .t{font:700 14px var(--fbn);}.banner .bx .s{font:400 11.5px var(--fbn);opacity:.85;margin-top:2px;}
+.banner.ai{background:linear-gradient(120deg,#143a8a,#2a73d4);}
+.banner.support{background:#fff;color:var(--ink);border:1px solid var(--line);}
+.banner.support .s{color:var(--ink3);}
+.banner .bbtn{background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:var(--pill);font:700 11.5px var(--fbn);padding:8px 12px;cursor:pointer;}
+.banner.support .bbtn{background:var(--mag50);border:none;color:var(--magenta);}
+.mentor{width:124px;background:#fff;border:1px solid var(--line);border-radius:var(--r);padding:13px;text-align:center;box-shadow:var(--e1);}
+.mentor .mp{width:54px;height:54px;border-radius:50%;margin:0 auto 9px;background:linear-gradient(135deg,#EEF0FA,#dfe3f7);display:flex;align-items:center;justify-content:center;color:var(--indigo);}
+.mentor .mn{font:600 12.5px var(--fbn);}.mentor .ms{font:400 10.5px var(--fbn);color:var(--ink3);margin-top:1px;}
+.sctoast{position:absolute;left:50%;bottom:84px;transform:translateX(-50%) translateY(8px);background:var(--ink);color:#fff;font:600 12px var(--fbn);padding:10px 16px;border-radius:var(--pill);box-shadow:var(--e2);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s;max-width:300px;text-align:center;z-index:60;}
+.sctoast.on{opacity:1;transform:translateX(-50%) translateY(0);}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;}}
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute"><defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#2A3580"/><stop offset="1" stop-color="#E0337F"/></linearGradient></defs></svg>
+
+<div class="phone"><div class="stage">
+
+  <div class="sb"><span>9:41</span><span class="ic"><i></i><i></i><i class="b"></i></span></div>
+
+  <div class="top">
+    <div class="tleft">
+      <img class="tbird" src="assets/shikho-icon-trimmed.png" alt="Shikho"/>
+      <span class="tai"><svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 2l1.7 6.3L20 10l-6.3 1.7L12 18l-1.7-6.3L4 10l6.3-1.7z"/></svg></span>
+      <button class="tclass bn">ক্লাস ১০ · HSC ২৭ বিজ্ঞান <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg></button>
+    </div>
+    <div class="tav en">T</div>
+  </div>
+
+  <div class="screens">
+
+    <!-- HOME (real Shikho home + StudyCircle join) -->
+    <section class="screen on" id="s-home">
+
+      <div class="firstclass" id="fcCard">
+        <span class="fc-eyebrow bn"><svg viewBox="0 0 24 24" width="11" height="11" fill="currentColor"><path d="M12 2.5l1.6 5.6 5.6 1.6-5.6 1.6L12 17.5l-1.6-5.6L4.8 10.3l5.6-1.6z"/></svg> তোমার জন্য</span>
+        <div class="fc-main">
+          <div class="fc-ic"><svg viewBox="0 0 24 24" width="22" height="22" fill="currentColor"><polygon points="8 5 19 12 8 19"/></svg></div>
+          <div class="fc-tx">
+            <div class="fc-t bn" id="fcTitle">তোমার প্রথম ক্লাস রেডি</div>
+            <div class="fc-course bn" id="fcCourse">পদার্থবিজ্ঞান · নিউটনের সূত্র, পাঠ ১</div>
+          </div>
+        </div>
+        <div class="fc-meta">
+          <span class="fc-min bn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg> মাত্র ৫ মিনিট</span>
+          <span class="fc-soc bn"><svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="8" r="3.2"/><path d="M21 19v-1a4 4 0 0 0-3-3.8"/></svg> <span id="fcSoc">১০+ সহপাঠী আজ পড়েছে</span></span>
+        </div>
+        <button class="fc-cta bn" id="fcBtn" onclick="scStart(this)"><span id="fcBtnT">শুরু করো</span> <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg></button>
+      </div>
+
+      <div class="sec-h"><h3 class="bn">আজকের রুটিন</h3><a class="bn">রুটিন দেখো <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a></div>
+      <div class="car">
+        <div class="rcard">
+          <span class="ty bn"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12l5 5L20 6"/></svg> সমাধান ক্লাস</span>
+          <div class="nm bn">পদার্থবিজ্ঞান · বলবিদ্যা</div>
+          <div class="tm bn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg> সন্ধ্যা ৭:০০</div>
+          <div class="soc bn"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="8" r="3.2"/><path d="M21 19v-1a4 4 0 0 0-3-3.8"/></svg> ১০+ জন</div>
+        </div>
+        <div class="rcard">
+          <span class="ty bn"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="6 4 20 12 6 20"/></svg> লেকচার</span>
+          <div class="nm bn">রসায়ন · পর্যায় সারণি</div>
+          <div class="tm bn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg> রাত ৮:৩০</div>
+          <div class="soc bn"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="8" r="3.2"/><path d="M21 19v-1a4 4 0 0 0-3-3.8"/></svg> ৫+ জন</div>
+        </div>
+        <div class="rcard">
+          <span class="ty bn"><svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3 8-8M21 12v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h9"/></svg> অধ্যায় পরীক্ষা</span>
+          <div class="nm bn">জীববিজ্ঞান · কোষ</div>
+          <div class="tm bn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M12 8v4l3 2"/></svg> কাল সকাল ১০:০০</div>
+          <div class="soc bn"><svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="8" r="3.2"/><path d="M21 19v-1a4 4 0 0 0-3-3.8"/></svg> ২০+ জন</div>
+        </div>
+      </div>
+
+      <div class="trial">
+        <div class="ti"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 1.5M9 2h6"/></svg></div>
+        <div class="tx"><div class="t bn">ফ্রি-তে শেখার ৩ দিন বাকি</div><div class="s bn">সব ক্লাস, নোট ও পরীক্ষা আনলক করো</div></div>
+        <button class="cta bn">ফ্রি চ্যাপ্টার দেখো</button>
+      </div>
+
+      <div class="sec-h"><h3 class="bn">স্টোরিজ</h3></div>
+      <div class="car">
+        <div class="story"><div class="th"><svg class="pl" viewBox="0 0 24 24" width="20" height="20" fill="#fff"><polygon points="8 5 19 12 8 19"/></svg></div><div class="cap bn">৬০ সেকেন্ডে নিউটনের সূত্র</div></div>
+        <div class="story"><div class="th" style="background:linear-gradient(160deg,#143a8a,#2a73d4)"><svg class="pl" viewBox="0 0 24 24" width="20" height="20" fill="#fff"><polygon points="8 5 19 12 8 19"/></svg></div><div class="cap bn">পরীক্ষার আগের রাতে</div></div>
+        <div class="story"><div class="th" style="background:linear-gradient(160deg,#8a5e09,#D49612)"><svg class="pl" viewBox="0 0 24 24" width="20" height="20" fill="#fff"><polygon points="8 5 19 12 8 19"/></svg></div><div class="cap bn">টপারের রুটিন</div></div>
+        <div class="story"><div class="th" style="background:linear-gradient(160deg,#2E9E6B,#37b87c)"><svg class="pl" viewBox="0 0 24 24" width="20" height="20" fill="#fff"><polygon points="8 5 19 12 8 19"/></svg></div><div class="cap bn">দ্রুত মুখস্থের কৌশল</div></div>
+      </div>
+
+      <div class="sec-h"><h3 class="bn">তোমার প্রোগ্রাম · HSC ২৭ বিজ্ঞান</h3><a class="bn">সব <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a></div>
+      <div class="car">
+        <div class="qcard"><div class="q en">Quarter 1</div><div class="qs bn">ভিত্তি অধ্যায়সমূহ</div><div class="pgb"><i style="width:100%"></i></div></div>
+        <div class="qcard"><div class="q en">Quarter 2</div><div class="qs bn">বলবিদ্যা ও তাপ</div><div class="pgb"><i style="width:62%"></i></div></div>
+        <div class="qcard"><div class="q en">Quarter 3</div><div class="qs bn">তড়িৎ ও আলো</div><div class="pgb"><i style="width:0%"></i></div></div>
+      </div>
+
+      <div class="sec-h"><h3 class="bn">সবচেয়ে গুরুত্বপূর্ণ ক্লাস</h3><a class="bn">আরও দেখো <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></a></div>
+      <div class="car">
+        <div class="vcard"><div class="th"><svg class="pl" viewBox="0 0 24 24" width="26" height="26" fill="#fff"><polygon points="8 5 19 12 8 19"/></svg><span class="dur en">12:40</span></div><div class="vt bn">নিউটনিয়ান বলবিদ্যা · পর্ব ৪</div><div class="soc bn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> ১০+ জন</div></div>
+        <div class="vcard"><div class="th" style="background:linear-gradient(135deg,#3a2f73,#7a2a63)"><svg class="pl" viewBox="0 0 24 24" width="26" height="26" fill="#fff"><polygon points="8 5 19 12 8 19"/></svg><span class="dur en">09:15</span></div><div class="vt bn">পর্যায় সারণি · দ্রুত রিভিশন</div><div class="soc bn"><svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg> ৫+ জন</div></div>
+      </div>
+
+      <div class="sec-h"><h3 class="bn">গুরুত্বপূর্ণ অধ্যায় প্লেলিস্ট</h3></div>
+      <div class="lrow"><div class="li"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h11M4 12h11M4 18h7M17 10v8M17 10l4-2v8"/></svg></div><div class="lt"><div class="a bn">পদার্থবিজ্ঞান · বোর্ড গুরুত্বপূর্ণ অধ্যায়</div><div class="b bn">৮টি প্লেলিস্ট</div></div><span class="chev"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+
+      <div class="banner"><div class="bx"><div class="t bn">মডেল টেস্ট সিরিজ শুরু</div><div class="s bn">প্রতি সপ্তাহে নতুন পরীক্ষা</div></div><button class="bbtn bn">দেখো</button></div>
+
+      <div class="sec-h"><h3 class="bn">এক্সক্লুসিভ গাইডলাইন</h3></div>
+      <div class="lrow"><div class="li"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M6 3h9l5 5v13H6z"/><path d="M15 3v5h5M9 13h6M9 17h4"/></svg></div><div class="lt"><div class="a bn">HSC ২৭ · পূর্ণ প্রস্তুতি গাইড</div><div class="b bn">সাবজেক্ট-ভিত্তিক রোডম্যাপ</div></div><span class="chev"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 6l6 6-6 6"/></svg></span></div>
+
+      <div class="sec-h"><h3 class="bn">হাইলাইটেড মেন্টর</h3></div>
+      <div class="car">
+        <div class="mentor"><div class="mp"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></div><div class="mn bn">শরিফুল ইসলাম</div><div class="ms bn">পদার্থবিজ্ঞান</div></div>
+        <div class="mentor"><div class="mp"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></div><div class="mn bn">নুসরাত জাহান</div><div class="ms bn">রসায়ন</div></div>
+        <div class="mentor"><div class="mp"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 6-6h4a6 6 0 0 1 6 6v1"/></svg></div><div class="mn bn">তানভীর আহমেদ</div><div class="ms bn">জীববিজ্ঞান</div></div>
+      </div>
+
+      <div class="sec-h" style="margin-top:18px;"><h3 class="bn">Shikho AI</h3></div>
+      <div class="banner ai"><div class="ti" style="width:38px;height:38px;border-radius:11px;background:rgba(255,255,255,.18);display:flex;align-items:center;justify-content:center;margin-right:12px;"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="7" width="16" height="12" rx="3"/><path d="M12 7V4M9 13h.01M15 13h.01M2 12v3M22 12v3"/></svg></div><div class="bx"><div class="t bn">Shikho AI-কে জিজ্ঞেস করো</div><div class="s bn">যেকোনো প্রশ্ন · সাজানো টেমপ্লেটসহ</div></div><button class="bbtn bn">খোলো</button></div>
+
+      <div class="banner support" style="margin-top:9px;"><div class="ti" style="width:38px;height:38px;border-radius:11px;background:var(--mag50);display:flex;align-items:center;justify-content:center;margin-right:12px;color:var(--magenta);"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h3l2 5-2.5 1.5a11 11 0 0 0 5 5L15 13l5 2v3a2 2 0 0 1-2 2A16 16 0 0 1 3 6a2 2 0 0 1 2-2"/></svg></div><div class="bx"><div class="t bn">সাহায্য দরকার?</div><div class="s bn">আমাদের সাপোর্ট টিমকে কল করো</div></div><button class="bbtn bn">কল</button></div>
+
+      <div style="height:10px;"></div>
+    </section>
+
+    <!-- COURSE (placeholder) -->
+    <section class="screen" id="s-course">
+      <div class="empty">
+        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v16.5H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H12v16.5h5.5A2.5 2.5 0 0 1 20 22z"/></svg>
+        <div class="t bn">তোমার কোর্স</div>
+      </div>
+    </section>
+
+    <!-- CIRCLE -->
+    <section class="screen" id="s-circle">
+      <div class="scWrap">
+        <div class="scHead">
+          <h2 class="scTitle bn">তোমার ক্লাস সার্কেল</h2>
+          <div class="scSub bn">ক্লাস ১০ · একসাথে পড়া</div>
+        </div>
+        <div class="scPresence">
+          <div class="scPi">
+            <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="8" r="3.2"/><path d="M21 19v-1a4 4 0 0 0-3-3.8"/></svg>
+          </div>
+          <div class="scPx">
+            <div class="scPt bn">আজ <b>১০+</b> জন পড়েছে</div>
+            <div class="scPs bn" id="scCirclePs">তোমার ক্লাসের সঙ্গীরা আজ পড়েছে</div>
+          </div>
+        </div>
+        <div class="scPanel">
+          <div class="scRow">
+            <div class="scRing">
+              <svg width="74" height="74"><circle class="scTk" cx="37" cy="37" r="32"/><circle class="scBr" id="scRingBar" cx="37" cy="37" r="32"/></svg>
+              <div class="scRingLabel">
+                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 0 1 9-9"/><path d="M21 12a9 9 0 0 1-9 9"/><path d="M12 8v4l2.5 1.5"/></svg>
+              </div>
+            </div>
+            <div class="scPanelX">
+              <div class="scPanelT bn">ক্লাস আজ <b>৩০+</b> লেসন শেষ করেছে</div>
+              <div class="scPanelS bn">সবাই মিলে এগিয়ে যাচ্ছে · কোনো র‍্যাঙ্ক নয়, শুধু সঙ্গ</div>
+            </div>
+          </div>
+          <div class="scBarWrap">
+            <div class="scBar"><i id="scBarFill"></i></div>
+            <div class="scBarCap bn">আজকের ক্লাস লক্ষ্য · ৪০ লেসন</div>
+          </div>
+        </div>
+        <div class="scGentle bn">
+          <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.6-9.5-9A5.2 5.2 0 0 1 12 6a5.2 5.2 0 0 1 9.5 6c-2.5 4.4-9.5 9-9.5 9z"/></svg>
+          একসাথে শিখলে শেখা সহজ হয় · তোমার পড়াও কারও সঙ্গ হয়ে ওঠে।
+        </div>
+        <button class="scCta bn" onclick="scStart(this)">
+          ক্লাসের সাথে পড়া শুরু করো
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+    </section>
+
+    <!-- PROFILE (summary) -->
+    <section class="screen" id="s-profile">
+      <div class="scyou">
+        <div class="scyou-h">
+          <div class="scyou-hi">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2.2l2.6 5.6 6.1.7-4.5 4.2 1.2 6L12 16l-5.4 2.7 1.2-6-4.5-4.2 6.1-.7z"/></svg>
+          </div>
+          <div class="scyou-ht">
+            <div class="t bn">তোমার পড়া</div>
+            <div class="s bn">তোমার ক্লাসের সাথে · শুধু তোমার জন্য</div>
+          </div>
+        </div>
+        <div class="scyou-tiles" id="scYouTiles">
+          <div class="scyou-tile">
+            <div class="scyou-ti">
+              <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="5" width="17" height="15" rx="2.5"/><path d="M3.5 9.5h17M8 3v3M16 3v3"/><path d="M8.6 14.6l2 2 4-4.4"/></svg>
+            </div>
+            <div class="scyou-tn bn"><b class="en" id="sumDays">০</b> দিন</div>
+            <div class="scyou-ts bn">ক্লাসের সাথে পড়েছ</div>
+          </div>
+          <div class="scyou-tile">
+            <div class="scyou-ti scyou-ti2">
+              <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v16.5H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H12v16.5h5.5A2.5 2.5 0 0 1 20 22z"/></svg>
+            </div>
+            <div class="scyou-tn bn"><b class="en" id="sumLessons">০</b>টি লেসন</div>
+            <div class="scyou-ts bn">এই সপ্তাহে শেষ</div>
+          </div>
+        </div>
+        <div class="scyou-emptybox" id="scYouEmpty" hidden>
+          <div class="eb-ic"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v16.5H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H12v16.5h5.5A2.5 2.5 0 0 1 20 22z"/></svg></div>
+          <div class="eb-t bn">এখনো শুরু করোনি</div>
+          <div class="eb-s bn">ক্লাসের সাথে প্রথম পাঠটা শুরু করো, এখানে তোমার অগ্রগতি জমা হবে।</div>
+        </div>
+        <div class="scyou-note">
+          <div class="scyou-ni">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="8" r="3.2"/><path d="M21 19v-1a4 4 0 0 0-3-3.8"/></svg>
+          </div>
+          <div class="scyou-nt bn">তোমার ক্লাস আজও পড়ছে, যোগ দাও</div>
+        </div>
+        <button class="scyou-cta bn" onclick="openCircle()">ক্লাস সার্কেলে যাও
+          <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h13M13 6l6 6-6 6"/></svg>
+        </button>
+      </div>
+      <div style="text-align:center;padding:2px 0 16px;"><button onclick="scReset()" style="background:none;border:none;color:var(--ink3);font:600 11px var(--fbn);text-decoration:underline;cursor:pointer;">ডেমো রিসেট</button></div>
+    </section>
+
+  </div>
+
+  <div class="nav" id="appNav">
+    <button class="t on bn" data-s="home" onclick="showScreen('home')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M3 11l9-7 9 7"/><path d="M5 10v10h14V10"/></svg>হোম</button>
+    <button class="t bn" data-s="course" onclick="showScreen('course')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H12v16.5H6.5A2.5 2.5 0 0 0 4 22z"/><path d="M20 5.5A2.5 2.5 0 0 0 17.5 3H12v16.5h5.5A2.5 2.5 0 0 1 20 22z"/></svg>কোর্স</button>
+    <button class="t bn" data-s="circle" onclick="showScreen('circle')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="8" r="3.2"/><path d="M21 19v-1a4 4 0 0 0-3-3.8"/></svg>সার্কেল</button>
+    <button class="t bn" data-s="profile" onclick="showScreen('profile')"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="4"/><path d="M4 21v-1a6 6 0 0 1 12 0v1"/></svg>প্রোফাইল</button>
+  </div>
+
+  <!-- LESSON overlay -->
+  <div class="lesson-overlay" id="s-lesson">
+    <div class="sc-lh">
+      <div class="sc-row">
+        <div class="sc-bk" onclick="showScreen(SC.lastScreen||'home')" role="button" aria-label="back">
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg>
+        </div>
+        <div>
+          <div class="sc-lt bn">ফ্রি চ্যাপ্টার · নিউটনের সূত্র</div>
+          <div class="sc-ls bn">ফ্রি ক্লাস · ক্লাস ১০</div>
+        </div>
+      </div>
+    </div>
+    <div class="sc-body">
+      <div class="sc-free">
+        <div class="sc-fi">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M8.5 12.4l2.4 2.4 4.6-5"/></svg>
+        </div>
+        <div class="sc-fx">
+          <div class="a bn">তোমার ফ্রি অ্যাক্সেস চালু আছে</div>
+          <div class="b bn">আগে শিখো, পরে সিদ্ধান্ত · কোনো চাপ নেই</div>
+        </div>
+      </div>
+      <div class="sc-player">
+        <div class="sc-pmotif">
+          <svg viewBox="0 0 200 120" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="42" cy="86" r="13"/><path d="M55 86h44"/><path d="M91 80l8 6-8 6"/><path d="M42 73V42"/><path d="M36 50l6-8 6 8"/><path d="M150 28a42 42 0 0 1 0 64" stroke-dasharray="3 7"/><circle cx="150" cy="28" r="4" fill="#fff" stroke="none"/></svg>
+        </div>
+        <div class="sc-pglow"></div>
+        <div class="sc-ptopic"><span class="sc-tg">ফ্রি</span><span class="sc-lb bn">অধ্যায় ১ · নিউটনের সূত্র</span></div>
+        <div class="sc-pbtn" id="scPlayBtn" onclick="scPlay()">
+          <svg id="scPlayIc" viewBox="0 0 24 24" width="24" height="24" fill="currentColor"><polygon points="8 5 19 12 8 19"/></svg>
+        </div>
+        <span class="sc-pdur en">12:40</span>
+        <div class="sc-pbar"><i id="scPbar"></i></div>
+      </div>
+      <button class="sc-troublelink bn" onclick="scTrouble()">ভিডিও আসছে না? আবার লোড করো</button>
+      <div class="sc-value bn">
+        <div class="vi"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4.5"/></svg></div>
+        <div>
+          <div class="a">এই চ্যাপ্টার শেষে তুমি পারবে</div>
+          <div class="b">নিউটনের সূত্র দিয়ে সহজ অঙ্ক নিজে সমাধান করতে</div>
+        </div>
+      </div>
+      <div class="sc-presence">
+        <div class="pi"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M16 19v-1a4 4 0 0 0-4-4H7a4 4 0 0 0-4 4v1"/><circle cx="9.5" cy="8" r="3.2"/><path d="M21 19v-1a4 4 0 0 0-3-3.8"/></svg></div>
+        <div>
+          <div class="pt bn">আজ ১০+ জন এই চ্যাপ্টার করেছে</div>
+          <div class="ps bn">একসাথে শেখা · কোনো র‍্যাঙ্ক নয়, শুধু সঙ্গ</div>
+        </div>
+      </div>
+      <div class="sc-h bn">আজকের ধাপ<span class="cnt bn">৩টি ধাপ · ৫ মিনিট</span></div>
+      <div class="sc-step"><div class="n en">1</div><div class="sx"><div class="a bn">আগে নিজে চেষ্টা করো</div><div class="b bn">একটা ছোট প্রশ্ন · উত্তর দাও, তারপর ব্যাখ্যা</div></div></div>
+      <div class="sc-step"><div class="n en">2</div><div class="sx"><div class="a bn">ভিডিও ব্যাখ্যা দেখো</div><div class="b bn">ধাপে ধাপে সমাধান</div></div></div>
+      <div class="sc-step"><div class="n en">3</div><div class="sx"><div class="a bn">নিজে মিলিয়ে নাও</div><div class="b bn">তুমি বুঝেছ কিনা যাচাই</div></div></div>
+      <button class="sc-finish bn" onclick="scFinish(this)">আজকের চ্যাপ্টার শেষ করো <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6L9 17l-5-5"/></svg></button>
+    </div>
+  </div>
+
+  <!-- loading state -->
+  <div class="sc-load" id="scLoad">
+    <div class="sc-spin"></div>
+    <div class="lt bn">এক মুহূর্ত, তোমার কন্টেন্ট আনছি</div>
+    <div class="lsk"><i></i><i></i></div>
+  </div>
+
+  <!-- broken-load recovery state (defined, not blank, never log out) -->
+  <div class="sc-recover" id="scRecover">
+    <div class="rback" onclick="scShowLesson('content')"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 6l-6 6 6 6"/></svg></div>
+    <div class="ri"><svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></div>
+    <div class="rt bn">একটু সমস্যা হচ্ছে</div>
+    <div class="rs bn">তোমার অ্যাকাউন্ট আর পড়া সব ঠিক আছে। আমরা নিজেই আবার চেষ্টা করছি।</div>
+    <button class="rbtn bn" onclick="scRetry()">আবার চেষ্টা করো <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg></button>
+    <button class="rsupport bn" onclick="return false;">সাহায্য লাগবে?</button>
+  </div>
+
+  <div class="sctoast" id="scToast"></div>
+
+</div></div>
+
+<script>
+function toBn(n){return(''+n).replace(/[0-9]/g,function(d){return'০১২৩৪৫৬৭৮৯'[d];});}
+
+/* ---- saved state (persists across reload) ---- */
+var SC={classLabel:'ক্লাস ১০',lessonsDone:0,daysStudied:0,lastDay:'',lastScreen:'home'};
+function scLoad(){try{var s=JSON.parse(localStorage.getItem('sc_v1'));if(s&&typeof s==='object')SC=Object.assign(SC,s);}catch(e){}}
+function scSave(){try{localStorage.setItem('sc_v1',JSON.stringify(SC));}catch(e){}}
+function scRender(){
+  var started=(SC.lessonsDone>0);
+  var ft=document.getElementById('fcTitle'),fc=document.getElementById('fcCourse'),fs=document.getElementById('fcSoc'),fb=document.getElementById('fcBtnT');
+  if(ft)ft.textContent=started?'আজও ক্লাসের সাথে পড়ো':'তোমার প্রথম ক্লাস রেডি';
+  if(fc)fc.textContent=started?('তোমার পরের পাঠ · নিউটনের সূত্র, পাঠ '+toBn(SC.lessonsDone+1)):'পদার্থবিজ্ঞান · নিউটনের সূত্র, পাঠ ১';
+  if(fs)fs.textContent=started?'তুমি আর ১০+ জন আজ পড়েছ':'১০+ সহপাঠী আজ পড়েছে';
+  if(fb)fb.textContent=started?'চালিয়ে যাও':'শুরু করো';
+  var sd=document.getElementById('sumDays'),sl=document.getElementById('sumLessons');
+  if(sd)sd.textContent=toBn(SC.daysStudied);
+  if(sl)sl.textContent=toBn(SC.lessonsDone);
+  var empty=(SC.lessonsDone===0&&SC.daysStudied===0);
+  var tiles=document.getElementById('scYouTiles'),eb=document.getElementById('scYouEmpty');
+  if(tiles)tiles.hidden=empty;
+  if(eb)eb.hidden=!empty;
+  var cps=document.getElementById('scCirclePs');if(cps)cps.textContent=(SC.lessonsDone>0)?'তুমিও আজ পড়েছ · ক্লাসের সাথে আছো':'তোমার ক্লাসের সঙ্গীরা আজ পড়েছে';
+}
+
+/* ---- router ---- */
+function showScreen(id){
+  closeLesson();
+  document.querySelectorAll('.screen').forEach(function(s){s.classList.remove('on');});
+  var el=document.getElementById('s-'+id);
+  if(el){el.classList.add('on');el.scrollTop=0;}
+  document.querySelectorAll('#appNav .t').forEach(function(b){b.classList.toggle('on',b.getAttribute('data-s')===id);});
+  SC.lastScreen=id;scSave();
+  if(id==='circle')runCircleAnim();
+}
+window.openCircle=function(){showScreen('circle');};
+var scLoadT;
+window.openLesson=function(kind){var l=document.getElementById('s-lesson');l.classList.add('on');l.scrollTop=0;if(window.scResetPlayer)scResetPlayer();scShowLesson('loading');clearTimeout(scLoadT);scLoadT=setTimeout(function(){scShowLesson('content');},800);};
+function closeLesson(){var l=document.getElementById('s-lesson');if(l)l.classList.remove('on');clearTimeout(scLoadT);scShowLesson('content');if(window.scResetPlayer)scResetPlayer();}
+function scShowLesson(state){var ld=document.getElementById('scLoad'),rc=document.getElementById('scRecover');if(ld)ld.classList.toggle('on',state==='loading');if(rc)rc.classList.toggle('on',state==='recover');}
+window.scTrouble=function(){scShowLesson('recover');};
+window.scRetry=function(){scShowLesson('loading');clearTimeout(scLoadT);scLoadT=setTimeout(function(){scShowLesson('content');},900);};
+
+/* ---- toast helper ---- */
+var scToastT;function showToast(m){var el=document.getElementById('scToast');if(!el)return;el.textContent=m;el.classList.add('on');clearTimeout(scToastT);scToastT=setTimeout(function(){el.classList.remove('on');},1900);}
+
+/* ---- Agent A: circle CTA + ring/bar anim ---- */
+window.scStart=function(b){
+  if(b){b.style.transform='scale(.97)';setTimeout(function(){b.style.transform='';},150);}
+  openLesson('class');
+};
+function runCircleAnim(){
+  var pct=75,C=201;
+  setTimeout(function(){
+    var bar=document.getElementById('scRingBar');if(bar)bar.style.strokeDashoffset=C-(C*pct/100);
+    var fill=document.getElementById('scBarFill');if(fill)fill.style.width=pct+'%';
+  },200);
+}
+
+/* ---- Agent C: lesson player + finish (saved) ---- */
+(function(){
+  var playing=false,t=null;
+  window.scPlay=function(){
+    var ic=document.getElementById('scPlayIc'),bar=document.getElementById('scPbar');
+    playing=!playing;
+    if(playing){
+      ic.innerHTML='<rect x="7" y="5" width="3.4" height="14" rx="1"/><rect x="13.6" y="5" width="3.4" height="14" rx="1"/>';
+      var w=parseFloat(bar.style.width)||0;
+      t=setInterval(function(){w=Math.min(100,w+1.4);bar.style.width=w+'%';if(w>=100){clearInterval(t);}},220);
+    }else{
+      ic.innerHTML='<polygon points="8 5 19 12 8 19"/>';
+      if(t)clearInterval(t);
+    }
+  };
+  window.scResetPlayer=function(){playing=false;if(t)clearInterval(t);var ic=document.getElementById('scPlayIc'),bar=document.getElementById('scPbar');if(bar)bar.style.width='0%';if(ic)ic.innerHTML='<polygon points="8 5 19 12 8 19"/>';};
+  window.scFinish=function(b){
+    if(b){b.style.transform='scale(.97)';setTimeout(function(){b.style.transform='';},150);}
+    SC.lessonsDone+=1;
+    var today;try{today=new Date().toLocaleDateString('en-CA');}catch(e){today='d';}
+    if(SC.lastDay!==today){SC.daysStudied+=1;SC.lastDay=today;}
+    scSave();scRender();showToast('দারুণ! তুমিও আজ ক্লাসের সাথে পড়েছ');openCircle();
+  };
+})();
+
+/* ---- demo reset (clears saved state) ---- */
+function scReset(){
+  try{localStorage.removeItem('sc_v1');}catch(e){}
+  SC={classLabel:'ক্লাস ১০',lessonsDone:0,daysStudied:0,lastDay:'',lastScreen:'home'};
+  scRender();showScreen('home');
+}
+
+/* ---- boot: restore saved state ---- */
+scLoad();scRender();
+showScreen(SC.lastScreen||'home');
+</script>
+</body>
+</html>
